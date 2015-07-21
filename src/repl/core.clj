@@ -59,40 +59,11 @@
     :start (start-repl "0.0.0.0" (or port (cfg/get-int @clj-plugin "repl.port")))
     :stop (stop-repl)))
 
-;; bukkure basic permission system
-(defn permission-command [sender player permission allow-type]
-  (plr/set-permission player permission allow-type))
-
-(defn player-permission-attach [ev]
-  (plr/permission-attach-player! @clj-plugin ev))
-
-(defn player-permission-detach [ev]
-  (plr/permission-detach-player! ev))
-
-(defn setup-permission-system
-  [plugin]
-  (ev/register-eventlist
-   plugin
-   [(ev/event "player.player-join" #'player-permission-attach)
-    (ev/event "player.player-quit" #'player-permission-detach)
-    (ev/event "player.player-kick" #'player-permission-detach)])
-  (plr/permission-attach-all! plugin))
-
-(defn disable-permission-system
-  []
-  (plr/permission-detach-all!))
-
-;; bukkure specific setup
 (defn start
   "onEnable bukkure"
   [plugin]
   (reset! clj-plugin plugin)
   (cmd/register-command @clj-plugin "clj.repl" #'repl-command [:keyword [:start :stop]] [:int [(cfg/get-int plugin "repl.port")]])
-  (cmd/register-command @clj-plugin "clj.tabtest" #'tabtest-command :player :material [:keyword [:start :stop]] [:string #'tabcomplete-reverse-first])
-  (cmd/register-command @clj-plugin "clj.addevent" #'addevent-command :event :string)
-  (cmd/register-command @clj-plugin "clj.spawnentity" #'spawn-command :entity)
-  (cmd/register-command @clj-plugin "clj.permission" #'permission-command :player :permission [:keyword [:allow :disallow :release]])
-  (setup-permission-system plugin)
   (start-repl-if-needed plugin))
 
 (defn stop
@@ -106,12 +77,10 @@
   [plugin]
   (cfg/config-defaults plugin)
   (start)
-  (log/info "Clojure Repl options: %s %s %s" (cfg/get-string plugin "repl.host") (cfg/get-int plugin "repl.port") (cfg/get-boolean plugin "repl.enabled"))
-  )
+  (log/info "Clojure Repl options: %s %s %s" (cfg/get-string plugin "repl.host") (cfg/get-int plugin "repl.port") (cfg/get-boolean plugin "repl.enabled")))
 
 (defn on-disable
   "to disable self or any child plugins"
   [plugin]
   (stop)
-  (log/info "Clojure stopped - %s" plugin)
-  )
+  (log/info "Clojure stopped - %s" plugin))
