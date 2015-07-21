@@ -1,0 +1,3 @@
+name: repl
+main: repl.BukkurePlugin
+version: 0.1.0
