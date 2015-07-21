@@ -1,5 +1,5 @@
 ;; TODO: Check this file manually
-(ns bukkurerepl.core 
+(ns repl.core 
   (:require [bukkure.bukkit :as bk]
             [bukkure.blocks :as blocks]
             [bukkure.events :as ev]
@@ -59,28 +59,17 @@
     :start (start-repl "0.0.0.0" (or port (cfg/get-int @clj-plugin "repl.port")))
     :stop (stop-repl)))
 
-(defn start
-  "onEnable bukkure"
-  [plugin]
-  (reset! clj-plugin plugin)
-  (cmd/register-command @clj-plugin "clj.repl" #'repl-command [:keyword [:start :stop]] [:int [(cfg/get-int plugin "repl.port")]])
-  (start-repl-if-needed plugin))
-
-(defn stop
-  "onDisable bukkure"
-  [plugin]
-  (stop-repl)
-  (disable-permission-system))
-
 (defn on-enable
-  "to enable self or any child plugins"
+  "onEnable REPL"
   [plugin]
   (cfg/config-defaults plugin)
-  (start)
+  (reset! clj-plugin plugin)
+  (cmd/register-command @clj-plugin "clj.repl" #'repl-command [:keyword [:start :stop]] [:int [(cfg/get-int plugin "repl.port")]])
+  (start-repl-if-needed plugin)
   (log/info "Clojure Repl options: %s %s %s" (cfg/get-string plugin "repl.host") (cfg/get-int plugin "repl.port") (cfg/get-boolean plugin "repl.enabled")))
 
 (defn on-disable
-  "to disable self or any child plugins"
+  "onDisable REPL"
   [plugin]
-  (stop)
-  (log/info "Clojure stopped - %s" plugin))
+  (stop-repl)
+  (log/info "Clojure Repl stopped - %s" plugin))

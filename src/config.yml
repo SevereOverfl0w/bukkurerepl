@@ -1,2 +1,4 @@
-repl.enable: true
-repl.localization: You have got won a %s!
+repl:
+  host: 0.0.0.0
+  port: 4005
+  enabled: true
